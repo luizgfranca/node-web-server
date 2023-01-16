@@ -1,12 +1,28 @@
 const http = require('http')
+const HttpMethod = require('./http/method')
+const ContentService = require('./service/content/content.service')
+const LoggerService = require('./service/logger/logger.service')
 
 const host = 'localhost'
 const port = 80
 
 const server = http.createServer((req, res) => {
-    res.statusCode = 200
-    res.setHeader('Content-Type', 'text/plain')
-    res.end('Hello world\n')
+    if(req.method === HttpMethod.GET) {
+        const maybeContent = ContentService.serveContent(req.url)
+
+        if(!maybeContent) {
+            res.statusCode = 404
+            return res.end()
+        }
+
+        res.statusCode = 200
+        res.setHeader('Content-Type', 'text/html')
+        return res.end( maybeContent );
+        
+    }
+
+    res.statusCode = 404
+    res.end()
 })
 
 server.listen(port, host, () => {
