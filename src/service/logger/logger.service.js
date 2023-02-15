@@ -5,7 +5,7 @@ const LogLevelOptions = {
     TRACE: 3
 }
 
-const LOG_LEVEL = LogLevelOptions.DEBUG;
+const LOG_LEVEL = LogLevelOptions.INFO;
 
 const LoggerService = {
     info: (args) => { console.info(args) },
