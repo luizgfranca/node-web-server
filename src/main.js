@@ -6,9 +6,9 @@ const LoggerService = require('./service/logger/logger.service')
 const host = 'localhost'
 const port = 80
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
     if(req.method === HttpMethod.GET) {
-        const maybeContent = ContentService.serveContent(req.url)
+        const maybeContent = await ContentService.serveContent(req.url);
 
         if(!maybeContent) {
             res.statusCode = 404

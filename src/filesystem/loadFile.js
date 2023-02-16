@@ -2,10 +2,16 @@ const fs = require('fs')
 const path = require('path');
 const LoggerService = require('../service/logger/logger.service');
 
-function loadFile(relativePath) {
+function loadFile(relativePath, loadedResourceResolver) {
     const absolutePath = path.resolve(__dirname, '..', '..', 'public', relativePath.replace('/', ''));
-    LoggerService.debug('Loading file: ' + absolutePath)
-    return fs.readFileSync(absolutePath);
+    LoggerService.debug('Reading file from filesystem: ' + absolutePath)
+    return fs.readFile(absolutePath, (error, data) => {
+        if(error) {
+            return setImmediate(() => loadedResourceResolver(relativePath, null))
+        }
+
+        return setImmediate(() => loadedResourceResolver(relativePath, data));
+    })
 }
 
-module.exports = loadFile;
+module.exports = loadFile
