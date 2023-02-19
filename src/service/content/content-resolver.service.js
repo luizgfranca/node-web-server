@@ -1,6 +1,6 @@
 const loadFile = require("../../filesystem/loadFile")
 
-class ContentRequestTableService {
+class ContentResolverService {
 
     constructor() {
         this.table = {};
@@ -33,4 +33,4 @@ class ContentRequestTableService {
 
 }
 
-module.exports = { ContentRequestTableService }
+module.exports = { ContentResolverService }
