@@ -4,7 +4,7 @@
   "description": "Simple http file server and gateway to explore more advanced nodejs concepts",
   "main": "src/main.js",
   "scripts": {
-    "server": "sudo node src/main.js",
+    "server": "node src/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "luizgfranca",

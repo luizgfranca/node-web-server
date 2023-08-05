@@ -12,13 +12,13 @@ const ContentService = {
 
             postRequest({
                 path: resourceRelativePath, 
-                callback: (data) => {
-                    if(data === null) {
+                callback: (fileStream) => {
+                    if(fileStream === null) {
                         LoggerService.log('Could not find: ' + resourceRelativePath);
                         resolve(null)
                     } 
     
-                    resolve(data)
+                    resolve(fileStream)
                 }
             })
         });

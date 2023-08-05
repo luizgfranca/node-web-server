@@ -4,12 +4,21 @@ const { ContentResolverService } = require('../service/content/content-resolver.
 const contentEvents = new EventEmitter()
 const contentResolverService = new ContentResolverService()
 
-contentEvents.on('content::request', ({path, callback}) => {
-    contentResolverService.postRequest(path, callback)
+contentEvents.setMaxListeners(0);
+
+contentEvents.on('content::request', (path) => {
+    contentResolverService.resolve(
+        path, 
+        (fileStream) => contentEvents.emit(`content::ready::${path}`, fileStream)
+    )
 })
 
 function postRequest({path, callback}) {
-    contentEvents.emit('content::request', {path, callback})
+    contentEvents.emit('content::request', path);
+    contentEvents.once(
+        `content::ready::${path}`, 
+        (fileStream) => callback(fileStream)
+    );
 }
 
 module.exports = { postRequest }; 

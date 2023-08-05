@@ -1,34 +1,48 @@
-const loadFile = require("../../filesystem/loadFile")
+const { loadFileStream } = require("../../filesystem/loadFile")
+
+const ResourceStatus = {
+    NONE: 0,
+    LOADING: 1,
+    STREAM_LOADED: 2
+};
 
 class ContentResolverService {
-
     constructor() {
-        this.table = {};
+        this.resourceState = {};
     }
 
-    postRequest(relativePath, requestCallback) {
-        if(!this.table[relativePath]) { 
-            this.table[relativePath] = []; 
+    resolve(relativePath, callback) {        
+        setImmediate(() => { 
+            if(
+                this.resourceState[relativePath] 
+                && this.resourceState[relativePath].status === ResourceStatus.LOADING
+            ) {
+                return;
+            }
 
-            setImmediate(() => { 
-                loadFile(relativePath, (relativePath, data) => {
-                    this.resolveRequest(relativePath, data)
-                }) 
-            })
-        }
+            this.resourceState[relativePath] = {
+                status: ResourceStatus.LOADING,
+                stream: null
+            };
 
-        this.table[relativePath].push(requestCallback);
-    }
+            loadFileStream(relativePath, (relativePath, fileStream) => {
+                this.resourceState[relativePath] = {
+                    status: ResourceStatus.STREAM_LOADED,
+                    stream: fileStream
+                };
 
-    resolveRequest(relativePath, data) {
-        if(!this.table[relativePath])
-            throw 'Invalid table mapping!'
+                if(fileStream != null) {
+                    fileStream.on('end', () => 
+                        this.resourceState[relativePath] = {
+                            status: ResourceStatus.NONE,
+                            stream: null
+                        }
+                    )
+                }
 
-        this.table[relativePath].forEach(requestCallback => {
-            process.nextTick(() => requestCallback(data));
-        });
-
-        this.table[relativePath] = null;
+                callback(fileStream)
+            }) 
+        })
     }
 
 }

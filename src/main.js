@@ -4,20 +4,20 @@ const ContentService = require('./service/content/content.service')
 const LoggerService = require('./service/logger/logger.service')
 
 const host = 'localhost'
-const port = 80
+const port = 8080
 
 const server = http.createServer(async (req, res) => {
     if(req.method === HttpMethod.GET) {
-        const maybeContent = await ContentService.serveContent(req.url);
+        const maybeFileStream = await ContentService.serveContent(req.url);
 
-        if(!maybeContent) {
+        if(!maybeFileStream) {
             res.statusCode = 404
             return res.end()
         }
 
         res.statusCode = 200
         res.setHeader('Content-Type', 'text/html')
-        return res.end( maybeContent );
+        return maybeFileStream.pipe(res)
         
     }
 
@@ -25,6 +25,6 @@ const server = http.createServer(async (req, res) => {
     res.end()
 })
 
-server.listen(port, host, () => {
+server.listen(port, () => {
     console.log(`Listening to ${host}:${port}`)
 })
